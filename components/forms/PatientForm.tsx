@@ -2,26 +2,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import CFormField from "./CustomFormField";
 import { Button } from "@/components/ui/button"
 import {
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+
 } from "@/components/ui/form"
 import CustomFormField from "./CustomFormField";
 export enum FormFieldType {
   INPUT = "input",
-  TEXTAREA= 'textarea'
-  PHONE_INPUT='phoneInput'
-  CHECKBOX='checkbox'
-  DATE_PICKER='datePicker'
-  SELECT='select'
-  SKELETON='skeleton'
+  TEXTAREA= 'textarea',
+  PHONE_INPUT='phoneInput',
+  CHECKBOX='checkbox',
+  DATE_PICKER='datePicker',
+  SELECT='select',
+  SKELETON='skeleton',
 }
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -51,7 +45,10 @@ const PatientForm = () => {
 <h1 className="header">Hi there 👋</h1>
 <p className="text-dark-700">Scheduled your first appointment</p>
         </section>
-    <CustomFormField control={form.control}/>
+    <CustomFormField fieldType={FormFieldType.INPUT} control={form.control} name="name" label="Full Name" placeholder="John Doe" iconSrc="/assets/icons/user.svg" iconAlt="user"/>
+    <CustomFormField fieldType={FormFieldType.INPUT} control={form.control} name="email" label="Email" placeholder="JohnDoe@js.com" iconSrc="/assets/icons/email.svg" iconAlt="user"/>
+    <CustomFormField fieldType={FormFieldType.PHONE_INPUT} control={form.control} name="Phone" label="Phone Number" placeholder="+359 123 456 899" iconSrc="/assets/icons/user.svg" iconAlt="user"/>
+
         <Button type="submit">Submit</Button>
       </form>
     </Form>
