@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button"
 import {
@@ -8,6 +8,11 @@ import {
 
 } from "@/components/ui/form"
 import CustomFormField from "./CustomFormField";
+import CustomSubmitBtn from "../ui/CustomSubmitBtn";
+import { useState } from "react";
+import UserFormSchema from "@/lib/validation";
+import { useRouter } from "next/navigation";
+import PhoneInput from "react-phone-number-input/input";
 export enum FormFieldType {
   INPUT = "input",
   TEXTAREA= 'textarea',
@@ -17,26 +22,36 @@ export enum FormFieldType {
   SELECT='select',
   SKELETON='skeleton',
 }
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
+
 
 const PatientForm = () => {
+  const router=useRouter;
+  const [isLoading, setIsLoading]=useState(false)
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof UserFormSchema>>({
+    resolver: zodResolver(UserFormSchema),
     defaultValues: {
-      username: "",
+      name:"",
+      email:"",
+      phone:"",
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit({name, email,phone}: z.infer<typeof UserFormSchema>) {
+  //   const userData={name,email,phone}
+  //   const user=await createUser(userData)
+  // if(user) router.push(`/patients/${user.$id}/register`)
+  setIsLoading(true);
+try {
+  const user ={
+    name:name,
+    email:email,
+    phone:phone,
+  }
+} catch (error) {
+  console.log(error)
+}
   }
   return (
     <Form {...form}>
@@ -47,9 +62,32 @@ const PatientForm = () => {
         </section>
     <CustomFormField fieldType={FormFieldType.INPUT} control={form.control} name="name" label="Full Name" placeholder="John Doe" iconSrc="/assets/icons/user.svg" iconAlt="user"/>
     <CustomFormField fieldType={FormFieldType.INPUT} control={form.control} name="email" label="Email" placeholder="JohnDoe@js.com" iconSrc="/assets/icons/email.svg" iconAlt="user"/>
-    <CustomFormField fieldType={FormFieldType.PHONE_INPUT} control={form.control} name="Phone" label="Phone Number" placeholder="+359 123 456 899" iconSrc="/assets/icons/user.svg" iconAlt="user"/>
-
-        <Button type="submit">Submit</Button>
+    <Controller
+          control={form.control}
+          name="phone" // This should match your validation schema
+          render={({ field }) => (
+            <CustomFormField
+              fieldType={FormFieldType.PHONE_INPUT}
+              control={form.control}
+              name="phone"
+              label="Phone Number"
+              placeholder="+359 123 456 899"
+              iconSrc="/assets/icons/phone.svg"
+              iconAlt="phone"
+            >
+              <PhoneInput
+                international
+                withCountryCallingCode
+                defaultCountry="BG"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Enter your phone number"
+                className="input-phone"
+              />
+            </CustomFormField>
+          )}
+        />
+   <CustomSubmitBtn isLoading={isLoading}>Get Started</CustomSubmitBtn>
       </form>
     </Form>
   )
